@@ -1,0 +1,1 @@
+spacetimedb-standalone start --data-dir /stdb/data --jwt-priv-key-path /etc/spacetimedb/id_ecdsa --jwt-pub-key-path .

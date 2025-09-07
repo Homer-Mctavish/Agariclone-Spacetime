@@ -1,0 +1,44 @@
+version: '3'
+services:
+  spacetime-db:
+    image: clockworklabs/spacetimedb:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_PORT=8000
+    networks:
+      - unity-network
+
+  unity-game:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - spacetime-db
+    environment:
+      - DATABASE_HOST=spacetime-db
+        - DATABASE_PORT=8000
+    links:
+      - spacetime-db
+    networks:
+      - unity-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl
+    depends_on:
+      - unity-game
+    networks:
+      - unity-network
+    environment:
+      - UNITY_GAME_HOST=unity-game:8080  # Unity game internal hostname
+
+networks:
+  unity-network:
+    driver: bridge
